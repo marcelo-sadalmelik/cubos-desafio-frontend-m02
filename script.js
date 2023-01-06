@@ -25,21 +25,10 @@ inputElement.addEventListener('keydown', (ev) => {
     if(busca) {
       buscarFilme(busca);
     } else {
-      fetch(URL_INICIAL_FILMES).then( async (response) => {
-        const data = await response.json();
-        const filmes = data.results.slice(0, 19);
-        paginas = [filmes.slice(0, 6), filmes.slice(6, 12), filmes.slice(12, 18)];
-        popularFilmes(paginas[0]);
-      });
+      buscaInicial();
     }
     inputElement.value = '';
   }
-});
-fetch(URL_INICIAL_FILMES).then( async (response) => {
-  const data = await response.json();
-  const filmes = data.results.slice(0, 19);
-  paginas = [filmes.slice(0, 6), filmes.slice(6, 12), filmes.slice(12, 18)];
-  popularFilmes(paginas[0]);
 });
 
 const criarFilme = (filme) => {
@@ -99,3 +88,13 @@ const buscarFilme = async (busca) => {
   paginas = [filmes.slice(0, 6), filmes.slice(6, 12), filmes.slice(12, 18)];
   popularFilmes(paginas[0]);
 }
+
+const buscaInicial = async () => {
+  const resposta = await fetch(URL_INICIAL_FILMES);
+  const data = await resposta.json();
+  const filmes = data.results.slice(0, 19);
+  paginas = [filmes.slice(0, 6), filmes.slice(6, 12), filmes.slice(12, 18)];
+  popularFilmes(paginas[0]);
+}
+
+buscaInicial();
