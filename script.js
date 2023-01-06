@@ -10,7 +10,12 @@ const hightlightRating = document.querySelector('.highlight__rating');
 const hightlightGenres = document.querySelector('.highlight__genres');
 const hightlightLaunch = document.querySelector('.highlight__launch');
 const hightlightDescriptions = document.querySelector('.highlight__description');
-
+const modal = document.querySelector('.modal');
+const modalTitle = document.querySelector('.modal__title');
+const modalImg = document.querySelector('.modal__img');
+const modalDescription = document.querySelector('.modal__description');
+const modalAverage = document.querySelector('.modal__average');
+const modalGenres = document.querySelector('.modal__genres');
 
 const URL_INICIAL_FILMES = 'https://tmdb-proxy.cubos-academy.workers.dev/3/discover/movie?language=pt-BR&include_adult=false';
 const URL_BUSCA_FILMES = `https://tmdb-proxy.cubos-academy.workers.dev/3/search/movie?language=pt-BR&include\_adult=false`;
@@ -43,10 +48,23 @@ inputElement.addEventListener('keydown', (ev) => {
   }
 });
 
+modal.addEventListener('click', () => {
+  exibirModal();
+})
+
 const criarFilme = (filme) => {
   const movie = document.createElement('div');
   movie.classList.add('movie');
   movie.style.backgroundImage = `url(${filme.poster_path})`;
+  movie.addEventListener('click', async () => {
+    exibirModal();
+    const { title, backdrop_path, overview, vote_average, genres } = await carregarDadosDoModal(filme.id);
+    modalTitle.textContent = title;
+    modalImg.src = backdrop_path;
+    modalDescription.textContent = overview;
+    modalAverage.textContent = Number(vote_average).toFixed(1);
+    genres.forEach(genre => modalGenres.appendChild(criarGenre(genre)));
+  })
 
   const movie__info = document.createElement('div');
   movie__info.classList.add('movie__info');
@@ -139,6 +157,33 @@ const formatarData = (currentDate) => {
     day: "numeric",
     timeZone: "UTC",
   });
+}
+
+const exibirModal = () => {
+  if(modal.classList.contains('hidden')){
+    modal.classList.remove('hidden');
+  } else {
+    modal.classList.add('hidden');
+    modalTitle.textContent = '';
+    modalImg.src = '';
+    modalDescription.textContent = '';
+    modalAverage.textContent = '';
+    while (modalGenres.firstChild){
+      modalGenres.firstChild.remove();
+    }
+  }
+}
+
+const carregarDadosDoModal = async (id) => {
+  const resultado = await fetch(`https://tmdb-proxy.cubos-academy.workers.dev/3/movie/${id}?language=pt-BR`);
+  return await resultado.json();
+}
+
+const criarGenre = (genre) => {
+  const spanGenre = document.createElement('span');
+  spanGenre.classList.add('modal__genre');
+  spanGenre.textContent = genre.name;
+  return spanGenre;
 }
 
 buscaInicial();
