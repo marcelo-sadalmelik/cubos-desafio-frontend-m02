@@ -3,8 +3,20 @@ const btnPrevElement = document.querySelector('.btn-prev');
 const btnNextElement = document.querySelector('.btn-next');
 const inputElement = document.querySelector('.input');
 
-const URL_INICIAL_FILMES = 'https://tmdb-proxy.cubos-academy.workers.dev/3/discover/movie?language=pt-BR&include_adult=false'
-const URL_BUSCA_FILMES = `https://tmdb-proxy.cubos-academy.workers.dev/3/search/movie?language=pt-BR&include\_adult=false`
+const highlightVideo = document.querySelector('.highlight__video');
+const highlightVideoLink = document.querySelector('.highlight__video-link');
+const highlightTitle = document.querySelector('.highlight__title');
+const hightlightRating = document.querySelector('.highlight__rating');
+const hightlightGenres = document.querySelector('.highlight__genres');
+const hightlightLaunch = document.querySelector('.highlight__launch');
+const hightlightDescriptions = document.querySelector('.highlight__description');
+
+
+const URL_INICIAL_FILMES = 'https://tmdb-proxy.cubos-academy.workers.dev/3/discover/movie?language=pt-BR&include_adult=false';
+const URL_BUSCA_FILMES = `https://tmdb-proxy.cubos-academy.workers.dev/3/search/movie?language=pt-BR&include\_adult=false`;
+const URL_FILME_DO_DIA = 'https://tmdb-proxy.cubos-academy.workers.dev/3/movie/436969?language=pt-BR';
+const URL_FILME_DO_DIA_VIDEO = 'https://tmdb-proxy.cubos-academy.workers.dev/3/movie/436969/videos?language=pt-BR';
+
 let paginaAtual = 0;
 let paginas = [];
 
@@ -97,4 +109,37 @@ const buscaInicial = async () => {
   popularFilmes(paginas[0]);
 }
 
+const carregarFilmeDoDia = async () => {
+  const respostaFilme = await fetch(URL_FILME_DO_DIA);
+  const respostaFilmeJson = await respostaFilme.json();
+
+  const respostaVideo = await fetch(URL_FILME_DO_DIA_VIDEO);
+  const respostaVideoJson = await respostaVideo.json();
+
+  highlightVideo.style.backgroundImage = `url(${respostaFilmeJson.backdrop_path})`
+  highlightTitle.textContent = respostaFilmeJson.title;
+  hightlightRating.textContent = Number(respostaFilmeJson.vote_average).toFixed(1);
+  hightlightGenres.textContent = montarGenres(respostaFilmeJson.genres);
+  hightlightLaunch.textContent = formatarData(respostaFilmeJson.release_date);
+  hightlightDescriptions.textContent = respostaFilmeJson.overview;
+  highlightVideoLink.href = `https://www.youtube.com/watch?v=${respostaVideoJson.results[0].key}`
+
+}
+
+const montarGenres = (array) => {
+  let genres = '';
+  array.forEach(genre => genres += genre.name +', ');
+  return genres.slice(0, -2);
+}
+
+const formatarData = (currentDate) => {
+  return new Date(currentDate).toLocaleDateString("pt-BR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 buscaInicial();
+carregarFilmeDoDia();

@@ -193,6 +193,8 @@
 
   width: 560px;
   height: 310px;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .highlight__info {
