@@ -1,9 +1,24 @@
 const moviesElement = document.querySelector('.movies');
+const btnPrevElement = document.querySelector('.btn-prev');
+const btnNextElement = document.querySelector('.btn-next');
 const URL_FILMES_INICIAL = 'https://tmdb-proxy.cubos-academy.workers.dev/3/discover/movie?language=pt-BR&include_adult=false'
+let paginaAtual = 0;
+let paginas = [];
+
+btnPrevElement.addEventListener('click', () => {
+  voltarPagina();
+  popularFilmes(paginas[paginaAtual]);
+})
+
+btnNextElement.addEventListener('click', () => {
+  avancarPagina();
+  popularFilmes(paginas[paginaAtual]);
+})
+
 fetch(URL_FILMES_INICIAL).then( async (response) => {
   const data = await response.json();
   const filmes = data.results.slice(0, 19);
-  const paginas = [filmes.slice(0, 6), filmes.slice(6, 12), filmes.slice(12, 18)];
+  paginas = [filmes.slice(0, 6), filmes.slice(6, 12), filmes.slice(12, 18)];
   popularFilmes(paginas[0]);
 })
 
@@ -35,5 +50,24 @@ const criarFilme = (filme) => {
 }
 
 const popularFilmes = (filmes) => {
+  while(moviesElement.firstChild){
+    moviesElement.firstChild.remove();
+  }
   filmes.forEach(filme => moviesElement.appendChild(criarFilme(filme)));
+}
+
+const avancarPagina = () => {
+  if(paginaAtual === 2){
+    paginaAtual = 0;
+  } else {
+    paginaAtual += 1;
+  }
+}
+
+const voltarPagina = () => {
+  if(paginaAtual === 0){
+    paginaAtual = 2;
+  } else {
+    paginaAtual -= 1;
+  }
 }
